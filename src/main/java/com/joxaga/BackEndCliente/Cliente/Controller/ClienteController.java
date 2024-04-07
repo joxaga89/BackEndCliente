@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/cliente")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ClienteController {
     @Autowired
     private ClienteService clientesService;
@@ -23,7 +24,7 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Cliente>> getAllStudent (
+    public ResponseEntity<Page<Cliente>> getAllClient (
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
             @RequestParam(required = false, defaultValue = "false") Boolean enablePagination
