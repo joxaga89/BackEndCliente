@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.joxaga.BackEndCliente.Cliente.Model.Cliente;
+import com.joxaga.BackEndCliente.Cliente.Repository.ClienteRepository;
 import com.joxaga.BackEndCliente.Cliente.Service.ClienteService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,9 @@ import java.util.Optional;
 public class ClienteController {
     @Autowired
     private ClienteService clientesService;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     public ResponseEntity<Void> handleOptions(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) {
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -80,9 +84,22 @@ public class ClienteController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<Cliente> editClient (@Valid @RequestBody Cliente cliente){
-        return ResponseEntity.status(HttpStatus.CREATED).body(clientesService.editClient(cliente));
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @RequestBody Cliente cliente) {
+        Optional<Cliente> clienteExistente = clientesService.findById(id);
+        System.out.println(clienteExistente);
+        if (clienteExistente.isPresent()) {
+            System.out.println("Encontro cliente");
+            cliente.setId(id); // Asigna el ID proporcionado al cliente
+            Cliente clienteActualizado = clienteRepository.save(cliente); // Actualiza el cliente
+            System.out.println(clienteActualizado);
+            System.out.println(new ResponseEntity<>(clienteActualizado, HttpStatus.OK));
+            return new ResponseEntity<>(clienteActualizado, HttpStatus.OK);
+        
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }
