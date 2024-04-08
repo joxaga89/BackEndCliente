@@ -159,7 +159,7 @@ const searchByCedula = async () => {
 
   return (
     <Container sx={{ mt: 2 }}>
-      <Typography variant="h4" align="center" gutterBottom>Clientes</Typography>
+      <Typography variant="h4" align="center" gutterBottom>Contactos</Typography>
       <Grid container spacing={2} alignItems="center" justifyContent="center">
         <Grid item xs={12} sm={6}>
           <TextField fullWidth size="small" label="Buscar por ID" value={searchId} onChange={handleSearchIdChange} />
@@ -238,7 +238,7 @@ const searchByCedula = async () => {
           </form>
         </DialogContent>
       </Dialog>
-      <Typography variant="h4" align="center" gutterBottom mt={2}>Crear Cliente</Typography>
+      <Typography variant="h4" align="center" gutterBottom mt={2}>Crear Contacto</Typography>
       <form onSubmit={(e) => { e.preventDefault(); saveCliente(); }}>
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} sm={6}>
