@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.joxaga.BackEndCliente.Cliente.Model.Cliente;
 import com.joxaga.BackEndCliente.Cliente.Repository.ClienteRepository;
+
+import java.util.List;
 import java.util.Optional;
 
  @Service
@@ -20,6 +22,10 @@ public class ClienteService {
             return clienteRepository.save(cliente);
         }
         return null;
+    }
+
+    public List<Cliente> saveListClient(List<Cliente> clientes) {
+        return clienteRepository.saveAll(clientes);
     }
 
     public Page<Cliente> getAllClient (Integer page, Integer size, Boolean enablePagination){

@@ -8,19 +8,39 @@ import org.springframework.web.bind.annotation.*;
 
 import com.joxaga.BackEndCliente.Cliente.Model.Cliente;
 import com.joxaga.BackEndCliente.Cliente.Service.ClienteService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import javax.validation.Valid;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/cliente")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.OPTIONS})
 public class ClienteController {
     @Autowired
     private ClienteService clientesService;
 
+    public ResponseEntity<Void> handleOptions(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) {
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Max-Age", "3600"); // 1 hour
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping
     public ResponseEntity<Cliente> saveClient (@Valid @RequestBody Cliente cliente){
         return ResponseEntity.status(HttpStatus.CREATED).body(clientesService.saveClient(cliente));
+    }
+
+    @PostMapping("/guardar_lista")
+    public ResponseEntity<List<Cliente>> guardarListaClientes(@RequestBody List<Cliente> clientes) {
+        List<Cliente> clientesGuardados = clientesService.saveListClient(clientes);
+        return new ResponseEntity<>(clientesGuardados, HttpStatus.CREATED);
     }
 
     @GetMapping
