@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.joxaga.BackEndCliente.Cliente.Model.Cliente;
 import com.joxaga.BackEndCliente.Cliente.Repository.ClienteRepository;
 
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +19,7 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Transactional
     public Cliente saveClient (Cliente cliente){
         if (cliente.getId() == null){
             return clienteRepository.save(cliente);
@@ -24,6 +27,7 @@ public class ClienteService {
         return null;
     }
 
+    @Transactional
     public List<Cliente> saveListClient(List<Cliente> clientes) {
         return clienteRepository.saveAll(clientes);
     }
@@ -40,10 +44,12 @@ public class ClienteService {
         return clienteRepository.findByCedula(cedula);
     }
 
+    @Transactional
     public void deleteClient(Long id){
         clienteRepository.deleteById(id);
     }
 
+    @Transactional
     public Cliente editClient (Cliente cliente){
         if (cliente.getId() != null && clienteRepository.existsById(cliente.getId())){
             return clienteRepository.save(cliente);
