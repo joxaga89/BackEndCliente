@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Typography, TextField, Button, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Paper, Grid, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TablePagination, TablePaginationActions } from '@mui/material';
+import { Container, Typography, TextField, Button, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Paper, Grid, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TablePagination } from '@mui/material';
 
 const ClienteComponent = () => {
   const [clientes, setClientes] = useState([]);
@@ -21,7 +21,6 @@ const ClienteComponent = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-
   useEffect(() => {
     fetchClientes();
   }, []);
@@ -31,7 +30,7 @@ const ClienteComponent = () => {
       const response = await axios.get('http://localhost:8080/cliente');
       setClientes(response.data.content);
     } catch (error) {
-      handleDialogError('Error al obtener clientes:', error);
+      handleDialogError('Error al obtener clientes:'+ error.response.status);
     }
   };
   
@@ -49,17 +48,18 @@ const ClienteComponent = () => {
       });
       handleDialogSuccess('Cliente guardado exitosamente');
     } catch (error) {
-      handleDialogError('Error al guardar cliente:', error);
+      handleDialogError('Error al guardar cliente:'+ error.response.status);
     }
   };
 
+  // Función para eliminar cliente
   const deleteCliente = async (id) => {
     try {
       await axios.delete(`http://localhost:8080/cliente/${id}`);
       fetchClientes();
       handleDialogSuccess('Cliente eliminado exitosamente');
     } catch (error) {
-      handleDialogError('Error al eliminar cliente:', error);
+      handleDialogError('Error al eliminar cliente:'+ error.response.status);
     }
   };
 
@@ -73,51 +73,59 @@ const ClienteComponent = () => {
     setOpenUpdateDialog(true);
   };
 
-// Función para manejar cambios en el campo de búsqueda por ID
-const handleSearchIdChange = (event) => {
-  const { value } = event.target;
-  setSearchId(value);
-  if (value === '') {
-    fetchClientes(); // Cargar todos los clientes si el campo de búsqueda está vacío
-  }
-};
-
-// Función para manejar cambios en el campo de búsqueda por cédula
-const handleSearchCedulaChange = (event) => {
-  const { value } = event.target;
-  setSearchCedula(value);
-  if (value === '') {
-    fetchClientes(); // Cargar todos los clientes si el campo de búsqueda está vacío
-  }
-};
-
-  // Modificar las funciones de búsqueda para cargar todos los clientes si los campos están vacíos
-const searchById = async () => {
-  try {
-    if (searchId.trim() === '') {
+  // Función para manejar cambios en el campo de búsqueda por ID
+  const handleSearchIdChange = (event) => {
+    const { value } = event.target;
+    setSearchId(value);
+    if (value === '') {
       fetchClientes(); // Cargar todos los clientes si el campo de búsqueda está vacío
-    } else {
-      const response = await axios.get(`http://localhost:8080/cliente/id/${searchId}`);
-      setClientes([response.data]);
     }
-  } catch (error) {
-    handleDialogError('Error al buscar cliente por ID:', error);
-  }
-};
+  };
 
-const searchByCedula = async () => {
-  try {
-    if (searchCedula.trim() === '') {
+  // Función para manejar cambios en el campo de búsqueda por cédula
+  const handleSearchCedulaChange = (event) => {
+    const { value } = event.target;
+    setSearchCedula(value);
+    if (value === '') {
       fetchClientes(); // Cargar todos los clientes si el campo de búsqueda está vacío
-    } else {
-      const response = await axios.get(`http://localhost:8080/cliente/cedula/${searchCedula}`);
-      setClientes([response.data]);
     }
-  } catch (error) {
-    handleDialogError('Error al buscar cliente por cédula:', error);
-  }
-};
+  };
 
+  // Función para buscar cliente por ID
+  const searchById = async () => {
+    try {
+      if (searchId.trim() === '') {
+        fetchClientes(); // Cargar todos los clientes si el campo de búsqueda está vacío
+      } else {
+        const response = await axios.get(`http://localhost:8080/cliente/id/${searchId}`);
+        setClientes([response.data]);
+      }
+    } catch (error) {
+      if(error.response.status == 404)      
+          handleDialogError('No se se encuentra el cliente en BD:'+ error.response.status);
+      else
+          handleDialogError('Error al buscar cliente por cédula:'+ error.response.status);
+    }
+  };
+
+  // Función para buscar cliente por cédula
+  const searchByCedula = async () => {
+    try {
+      if (searchCedula.trim() === '') {
+        fetchClientes(); // Cargar todos los clientes si el campo de búsqueda está vacío
+      } else {
+        const response = await axios.get(`http://localhost:8080/cliente/cedula/${searchCedula}`);
+        setClientes([response.data]);
+      }
+    } catch (error) {
+        if(error.response.status == 404)      
+            handleDialogError('No se se encuentra el cliente en BD:'+ error.response.status);
+        else
+            handleDialogError('Error al buscar cliente por cédula:'+ error.response.status);
+    }
+  };
+
+  // Función para actualizar cliente
   const updateCliente = async () => {
     try {
       await axios.put(`http://localhost:8080/cliente/${clienteToUpdate.id}`, clienteToUpdate);
@@ -125,33 +133,39 @@ const searchByCedula = async () => {
       handleDialogSuccess('Cliente actualizado exitosamente');
       setOpenUpdateDialog(false);
     } catch (error) {
-      handleDialogError('Error al actualizar cliente:', error);
+      handleDialogError('Error al actualizar cliente:'+ error.response.status);
     }
   };
 
+  // Función para manejar diálogos de éxito
   const handleDialogSuccess = (message) => {
     setDialogMessage(message);
     setOpenDialog(true);
   };
 
+  // Función para manejar diálogos de error
   const handleDialogError = (errorMessage, error) => {
     console.error(errorMessage, error);
     setDialogMessage(errorMessage);
     setOpenDialog(true);
   };
 
+  // Función para cerrar diálogo
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
 
+  // Función para cerrar diálogo de actualización
   const handleCloseUpdateDialog = () => {
     setOpenUpdateDialog(false);
   };
 
+  // Función para cambiar página
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  // Función para cambiar filas por página
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -163,7 +177,7 @@ const searchByCedula = async () => {
       <Grid container spacing={2} alignItems="center" justifyContent="center">
         <Grid item xs={12} sm={6}>
           <TextField fullWidth size="small" label="Buscar por ID" value={searchId} onChange={handleSearchIdChange} />
-      </Grid>
+        </Grid>
         <Grid item xs={12} sm={6}>
           <Button variant="contained" onClick={searchById}>Buscar</Button>
         </Grid>
@@ -190,7 +204,10 @@ const searchByCedula = async () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {clientes.map((cliente) => (
+            {(rowsPerPage > 0
+              ? clientes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : clientes
+            ).map((cliente) => (
               <TableRow key={cliente.id}>
                 <TableCell>{cliente.id}</TableCell>
                 <TableCell>{cliente.nombre}</TableCell>
@@ -207,6 +224,15 @@ const searchByCedula = async () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={clientes.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
       <Dialog open={openUpdateDialog} onClose={handleCloseUpdateDialog}>
         <DialogTitle>Actualizar Cliente</DialogTitle>
         <DialogContent>

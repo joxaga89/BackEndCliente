@@ -90,13 +90,11 @@ public class ClienteController {
         Optional<Cliente> clienteExistente = clientesService.findById(id);
         System.out.println(clienteExistente);
         if (clienteExistente.isPresent()) {
-            System.out.println("Encontro cliente");
             cliente.setId(id); // Asigna el ID proporcionado al cliente
             Cliente clienteActualizado = clienteRepository.save(cliente); // Actualiza el cliente
             System.out.println(clienteActualizado);
             System.out.println(new ResponseEntity<>(clienteActualizado, HttpStatus.OK));
             return new ResponseEntity<>(clienteActualizado, HttpStatus.OK);
-        
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
